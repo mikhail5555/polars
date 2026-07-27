@@ -3175,6 +3175,14 @@ dependencies = [
 ]
 
 [[package]]
+name = "polars-descriptions"
+version = "0.54.4"
+dependencies = [
+ "serde",
+ "strum_macros 0.28.0",
+]
+
+[[package]]
 name = "polars-doc-examples"
 version = "0.54.4"
 dependencies = [
@@ -3359,6 +3367,7 @@ dependencies = [
  "polars-io",
  "polars-json",
  "polars-mem-engine",
+ "polars-observer",
  "polars-ops",
  "polars-plan",
  "polars-stream",
@@ -3391,6 +3400,15 @@ dependencies = [
  "rayon",
  "recursive",
  "tokio",
+]
+
+[[package]]
+name = "polars-observer"
+version = "0.54.4"
+dependencies = [
+ "parking_lot",
+ "polars-descriptions",
+ "polars-error",
 ]
 
 [[package]]
@@ -3526,6 +3544,7 @@ dependencies = [
  "polars-compute",
  "polars-config",
  "polars-core",
+ "polars-descriptions",
  "polars-error",
  "polars-ffi",
  "polars-io",
@@ -3574,6 +3593,7 @@ dependencies = [
  "polars-compute",
  "polars-config",
  "polars-core",
+ "polars-descriptions",
  "polars-dtype",
  "polars-error",
  "polars-expr",
@@ -3581,19 +3601,23 @@ dependencies = [
  "polars-io",
  "polars-lazy",
  "polars-mem-engine",
+ "polars-observer",
  "polars-ooc",
  "polars-ops",
  "polars-parquet",
  "polars-plan",
  "polars-row",
+ "polars-stream",
  "polars-testing",
  "polars-time",
  "polars-utils",
  "pyo3",
  "rayon",
  "recursive",
+ "rmp-serde",
  "serde",
  "serde_json",
+ "slotmap",
  "uuid",
  "version_check",
 ]
@@ -3699,11 +3723,13 @@ dependencies = [
  "polars-compute",
  "polars-config",
  "polars-core",
+ "polars-descriptions",
  "polars-error",
  "polars-expr",
  "polars-io",
  "polars-json",
  "polars-mem-engine",
+ "polars-observer",
  "polars-ooc",
  "polars-ops",
  "polars-parquet",
@@ -3717,6 +3743,7 @@ dependencies = [
  "serde",
  "serde_json",
  "slotmap",
+ "strum_macros 0.28.0",
  "tokio",
  "uuid",
  "version_check",
@@ -3925,6 +3952,7 @@ dependencies = [
  "pyo3-build-config",
  "pyo3-ffi",
  "pyo3-macros",
+ "uuid",
 ]
 
 [[package]]

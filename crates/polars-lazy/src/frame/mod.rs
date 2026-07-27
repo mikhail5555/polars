@@ -656,8 +656,21 @@ impl LazyFrame {
             _ => (),
         }
 
-        let mut ir_plan = self.to_alp_optimized()?;
+        let observer = self
+            .opt_state
+            .query_monitoring()
+            .then(polars_observer::observer)
+            .flatten();
 
+        if let Some(o) = observer.as_ref() {
+            o.on_query_started()
+        }
+
+        let mut ir_plan = self.to_alp_optimized().inspect_err(|err| {
+            if let Some(o) = observer.as_ref() {
+                o.on_query_failed(err)
+            }
+        })?;
         ir_plan.ensure_root_node_is_sink();
 
         match engine {
@@ -666,6 +679,7 @@ impl LazyFrame {
                     ir_plan.lp_top,
                     &mut ir_plan.lp_arena,
                     &mut ir_plan.expr_arena,
+                    observer,
                 )
             }),
             Engine::InMemory | Engine::Gpu => {
@@ -867,6 +881,7 @@ impl LazyFrame {
                 ir_plan.lp_top,
                 &mut ir_plan.lp_arena,
                 &mut ir_plan.expr_arena,
+                None,
             )
         };
 
