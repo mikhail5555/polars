@@ -1561,6 +1561,15 @@ class Config(contextlib.ContextDecorator):
         """
         Enable runtime monitoring of query execution.
 
+        Query metrics are collected and sent to Polars Cloud, letting you inspect
+        the performance of your queries from the dashboard. This requires:
+
+        - A Polars Cloud account. Sign up at https://cloud.pola.rs/ (calling this
+          method triggers a browser-based login if you are not already
+          authenticated).
+        - The ``polars-cloud`` package installed in this environment
+          (``pip install polars-cloud``).
+
         Monitoring is only supported by the streaming engine, so enabling it also
         sets the engine affinity to ``"streaming"``. Disabling it does not restore
         the previous engine affinity.
@@ -1575,6 +1584,18 @@ class Config(contextlib.ContextDecorator):
         >>> pl.Config.enable_monitoring()  # doctest: +SKIP
         """
         if active:
+            try:
+                import polars_cloud as pc
+            except ImportError as e:
+                msg = (
+                    "query monitoring requires the `polars_cloud` package, which could "
+                    "not be imported. Install it into this environment "
+                    f"(e.g. `pip install polars-cloud`). ({e})"
+                )
+                raise ModuleNotFoundError(msg) from e
+
+            pc.authenticate()
+
             os.environ["POLARS_QUERY_MONITORING"] = "1"
             cls.set_engine_affinity("streaming")
         else:
