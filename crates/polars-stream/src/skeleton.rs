@@ -39,7 +39,14 @@ pub fn run_query(
     expr_arena: &mut Arena<AExpr>,
     observer: Option<Box<dyn QueryObserver>>,
 ) -> PolarsResult<QueryResult> {
-    let query = StreamingQuery::build(node, ir_arena, expr_arena, observer.is_some())?;
+    let query = StreamingQuery::build(node, ir_arena, expr_arena, observer.is_some()).inspect_err(
+        |err| {
+            if let Some(o) = observer.as_ref() {
+                o.on_query_failed(err)
+            }
+        },
+    )?;
+
     let _guard = observer
         .as_ref()
         .map(|o| o.on_query_planned(query.to_planned_query(node, ir_arena, expr_arena)));

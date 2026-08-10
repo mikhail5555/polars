@@ -5,7 +5,7 @@ use parking_lot::RwLock;
 use polars_descriptions::{IrNodeDescription, NodeMetricsDescription, PhysicalNodeDescription};
 use polars_error::PolarsError;
 
-pub type OnQueryFinishedGuard = Box<dyn Any + Send>;
+pub type QueryExecutionGuard = Box<dyn Any + Send>;
 
 pub trait QueryMetrics: Send + Sync {
     fn snapshot(&self) -> Vec<NodeMetricsDescription>;
@@ -62,10 +62,19 @@ impl PlannedQueryBuilder {
 }
 
 pub trait QueryObserver: Send {
+    /// Signals that the query has been submitted by the user and is about to start planning.
     fn on_query_started(&self);
 
-    fn on_query_planned(&self, query: PlannedQuery) -> OnQueryFinishedGuard;
+    /// Signals that the query has finished planning and is about to start executing.
+    ///
+    /// The returned [`QueryExecutionGuard`] is held for the duration of execution
+    /// and dropped once the query finishes, whether it succeeds or fails.
+    fn on_query_planned(&self, query: PlannedQuery) -> QueryExecutionGuard;
 
+    /// Signals that the query has failed.
+    ///
+    /// If the query had already been planned, this is called before its
+    /// [`QueryExecutionGuard`] is dropped.
     fn on_query_failed(&self, err: &PolarsError);
 }
 
